@@ -104,6 +104,12 @@ errors occured.
 
 Byte-compile configuration files if this value is non-nil.
 
+#### `init-loader-order` : `symbol` (default: `default-first`)
+
+If this value is `default-first`, platform-independent configurations
+are read first; otherwise platform-specific configurations are read
+first.
+
 ### Hooks
 
 #### `init-loader-before-compile-hook`

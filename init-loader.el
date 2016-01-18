@@ -105,6 +105,13 @@ log message is shown only errors occured."
   :type 'boolean
   :group 'init-loader)
 
+(defcustom init-loader-order 'default-first
+  "If this value is `default-first', platform-independent configurations are read first;
+otherwise platform-specific configurations are read first."
+  :type 'symbol
+  :options '(default-first platform-specific-first)
+  :group 'init-loader)
+
 (defcustom init-loader-default-regexp "\\(?:\\`[[:digit:]]\\{2\\}\\)"
   "Regular expression determining valid configuration file names.
 
@@ -149,7 +156,8 @@ example, 00_foo.el, 01_bar.el ... 99_keybinds.el."
   (let ((init-dir (init-loader-follow-symlink init-dir))
         (is-carbon-emacs nil))
     (assert (and (stringp init-dir) (file-directory-p init-dir)))
-    (init-loader-re-load init-loader-default-regexp init-dir t)
+    (if (eq init-loader-order 'default-first)
+      (init-loader-re-load init-loader-default-regexp init-dir t))
 
     ;; Windows
     (when (featurep 'dos-w32)
@@ -176,6 +184,9 @@ example, 00_foo.el, 01_bar.el ... 99_keybinds.el."
     ;; no-window
     (when (not window-system)
       (init-loader-re-load init-loader-nw-regexp init-dir))
+
+    (unless (eq init-loader-order 'default-first)
+      (init-loader-re-load init-loader-default-regexp init-dir t))
 
     (case init-loader-show-log-after-init
       (error-only (add-hook 'after-init-hook 'init-loader--show-log-error-only))
